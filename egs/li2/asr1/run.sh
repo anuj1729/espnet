@@ -1,4 +1,4 @@
-#!/bin/bash
+#/bin/bash
 
 # Copyright 2017 Johns Hopkins University (Shinji Watanabe)
 #  Apache 2.0  (http://www.apache.org/licenses/LICENSE-2.0)
@@ -50,30 +50,29 @@ if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
     # TODO
     # add a check whether the following data preparation is completed or not
 
-    # WSJ English
+    # Librispeech
     lang_code=en
-    if [ -e ../../wsj/asr1/data ]; then
-	utils/copy_data_dir.sh --utt-suffix -${lang_code} ../../wsj/asr1/data/train_si284 data/tr_${lang_code}
-	utils/copy_data_dir.sh --utt-suffix -${lang_code} ../../wsj/asr1/data/test_dev93 data/dt_${lang_code}
-	utils/copy_data_dir.sh --utt-suffix -${lang_code} ../../wsj/asr1/data/test_eval92 data/et_${lang_code}
+    if [ -e ../../librispeech/asr1/data ]; then
+	utils/copy_data_dir.sh --utt-suffix -${lang_code} ../../librispeech/asr1/data/train_clean_100 data/tr_${lang_code}
+	utils/copy_data_dir.sh --utt-suffix -${lang_code} ../../librispeech/asr1/data/dev_clean data/dt_${lang_code}
+	utils/copy_data_dir.sh --utt-suffix -${lang_code} ../../librispeech/asr1/data/test_clean data/et_${lang_code}
     else
-	echo "no wsj data directory found"
-	echo "cd ../../wsj/asr1/; ./run.sh --stop_stage 2; cd -"
+	echo "no librispeech data directory found"
+	echo "cd ../../librispeech/asr1/; ./run.sh --stop_stage 2; cd -"
 	exit 1;
     fi
-
-    # Voxforge
-    for lang_code in fr; do
-	if [ -e ../../voxforge/asr1/data/tr_${lang_code} ]; then
-            utils/copy_data_dir.sh --utt-suffix -${lang_code} ../../voxforge/asr1/data/tr_${lang_code} data/tr_${lang_code}
-            utils/copy_data_dir.sh --utt-suffix -${lang_code} ../../voxforge/asr1/data/dt_${lang_code} data/dt_${lang_code}
-            utils/copy_data_dir.sh --utt-suffix -${lang_code} ../../voxforge/asr1/data/et_${lang_code} data/et_${lang_code}
-	else
-	    echo "no voxforge ${lang_code} data directory found"
-	    echo "cd ../../voxforge/asr1/; ./run.sh --stop_stage 2 --lang ${lang_code}; cd -"
-	    exit 1;
-	fi
-    done
+    
+    lang_code=fr
+    # commonvoice
+    if [ -e ../../commonvoice/asr1/data ]; then
+         utils/copy_data_dir.sh --utt-suffix -${lang_code}_commonvoice ${commonvoice}/valid_train_${lang_code} data/tr_${lang_code}
+         utils/copy_data_dir.sh --utt-suffix -${lang_code}_commonvoice ${commonvoice}/valid_dev_${lang_code} data/dt_${lang_code}
+         utils/copy_data_dir.sh --utt-suffix -${lang_code}_commonvoice ${commonvoice}/valid_test_${lang_code} data/et_${lang_code} 
+    else
+        echo "no commonvoice data directory found"
+        echo "cd ../../commonvoice/asr1/; ./run.sh --stop_stage 2; cd -"
+        exit 1;
+    fi
 fi
 
 feat_tr_dir=${dumpdir}/${train_set}/delta${do_delta}; mkdir -p ${feat_tr_dir}
