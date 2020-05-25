@@ -1,16 +1,16 @@
 # network architecture
 # encoder related
 etype: blstmp     # encoder architecture type
-elayers: 4
-eunits: 512
-eprojs: 512
+elayers: 5
+eunits: 1024
+eprojs: 1024
 subsample: "1_2_2_1_1" # skip every n frame from input to nth layers
 # decoder related
 dlayers: 2
-dunits: 512
+dunits: 1024
 # attention related
 atype: location
-adim: 512
+adim: 1024
 aconv-chans: 10
 aconv-filts: 100
 

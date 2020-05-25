@@ -79,23 +79,12 @@ cv_train_dev=cv_valid_dev_${cv_lang}
 cv_test_set=cv_valid_test_${cv_lang}
 cv_recog_set="valid_dev_${cv_lang} valid_test_${cv_lang}"
 
+
+code_mixed_test_set=code_mixed
 train_set=train_nodev
 train_dev=train_dev
-recog_set="${cv_test_set} ${libri_recog_set}"
+recog_set="${code_mixed_test_set}"
 
-if [ ${exp_lang} = "en" ]
-then
-	recog_set=${libri_recog_set}
-elif [ $exp_lang = "fr" ]
-then
-	recog_set=${cv_test_set}
-elif [ $exp_lang = "both" ]
-then
-	recog_set="${cv_test_set} ${libri_recog_set}"
-else
-	echo "Wrong choice for exp_lang. You have given ${exp_lang}"
-	exit 0
-fi
 
 if [ ${stage} -le -1 ] && [ ${stop_stage} -ge -1 ]; then
     echo "stage -1: Data Download"
@@ -185,8 +174,8 @@ if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
     echo "stage 4: Feature Generation"
     fbankdir=fbank
     # Generate the fbank features; by default 80-dimensional fbanks with pitch on each frame
-    for x in ${train_set} ${train_dev} ${libri_recog_set} ${cv_test_set}; do
-        steps/make_fbank_pitch.sh --cmd "$train_cmd" --nj 8 --write_utt2num_frames true \
+    for x in ${code_mixed_test_set}; do
+        steps/make_fbank_pitch.sh --cmd "$train_cmd" --nj 1 --write_utt2num_frames true \
         data/${x} exp/make_fbank/${x} ${fbankdir}
     done
 
@@ -200,7 +189,7 @@ if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
     data/${train_dev}/feats.scp data/${train_set}/cmvn.ark exp/dump_feats/dev ${feat_dt_dir}
     for rtask in ${recog_set}; do
         feat_recog_dir=${dumpdir}/${rtask}/delta${do_delta}; mkdir -p ${feat_recog_dir}
-        dump.sh --cmd "$train_cmd" --nj 8 --do_delta ${do_delta} \
+        dump.sh --cmd "$train_cmd" --nj 3 --do_delta ${do_delta} \
         data/${rtask}/feats.scp data/${train_set}/cmvn.ark exp/dump_feats/recog/${rtask} \
         ${feat_recog_dir}
     done
@@ -277,7 +266,7 @@ if [ ${stage} -le 7 ] && [ ${stop_stage} -ge 7 ]; then
             asr_recog.py \
             --config ${decode_config} \
             --ngpu ${ngpu} \
-	    --batchsize 4 \
+	    --batchsize 3 \
             --backend ${backend} \
             --debugmode ${debugmode} \
             --verbose ${verbose} \
