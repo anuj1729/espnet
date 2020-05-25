@@ -76,9 +76,11 @@ ta_train_set=ta_train
 ta_dev_set=ta_dev
 ta_test_set=ta_test
 
+code_mixed_set=code_mixed_synthetic
+
 train_set=train_nodev
 train_dev=train_dev
-recog_set="${libri_recog_set}" 
+recog_set="${code_mixed_set}" 
 
 
 if [ ${stage} -le 0 ] && [ ${stop_stage} -ge 0 ]; then
@@ -169,7 +171,7 @@ if [ ${stage} -le 4 ] && [ ${stop_stage} -ge 4 ]; then
     echo "stage 4: Feature Generation"
     fbankdir=fbank
     # Generate the fbank features; by default 80-dimensional fbanks with pitch on each frame
-    for x in ${train_set} ${train_dev} ${libri_recog_set} ${ta_test_set}; do
+    for x in ${train_set} ${train_dev} ${code_mixed_set}; do
         steps/make_fbank_pitch.sh --cmd "$train_cmd" --nj 8 --write_utt2num_frames true \
         data/${x} exp/make_fbank/${x} ${fbankdir}
     done
@@ -245,7 +247,7 @@ fi
 
 if [ ${stage} -le 7 ] && [ ${stop_stage} -ge 7 ]; then
     echo "stage 7: Decoding"
-    nj=1
+    nj=4
     for rtask in ${recog_set}; do
         (
             decode_dir=decode_${rtask}_$(basename ${decode_config%.*})
@@ -262,7 +264,6 @@ if [ ${stage} -le 7 ] && [ ${stop_stage} -ge 7 ]; then
             --config ${decode_config} \
             --ngpu ${ngpu} \
             --backend ${backend} \
-	    --batchsize 4 \ 
             --debugmode ${debugmode} \
             --verbose ${verbose} \
             --recog-json ${feat_recog_dir}/split${nj}utt/data.JOB.json \
