@@ -1,9 +1,8 @@
 import os
 import ffmpeg
 
-
 ROOT = '/home/ram/anuj/espnet/egs/tamil/asr1'
-OUTPUT_DIR = os.path.join(ROOT,'downloads/Synthetic')
+OUTPUT_DIR = os.path.join(ROOT,'downloads/Synthetic2')
 TA_ROOT = os.path.join(ROOT,'downloads/ta/ta-in-Test/')
 TA_AUDIO_PATH = os.path.join(TA_ROOT,'Audios')
 TA_TRANSCRIPT = open(os.path.join(TA_ROOT,'transcription.txt'),'r')
@@ -15,7 +14,7 @@ LIBRI_TRANSCRIPT_LIST = LIBRI_TEXT.read().split('\n')
 
 OUTPUT_TRANSCRIPT = open(os.path.join(OUTPUT_DIR,'transcript.txt'),'w')
 
-length = 100
+length = len(LIBRI_TRANSCRIPT_LIST)
 for i in range(length):
 
     libri_file_name = LIBRI_TRANSCRIPT_LIST[i].split(',')[0]
@@ -28,8 +27,14 @@ for i in range(length):
     ta_file = ffmpeg.input(os.path.join(TA_AUDIO_PATH,ta_file_name + '.wav'))
     
     output_file_name = 'code_mixed_' + str(i + 1)
-    joint_transcript = ta_transcript + " " + libri_transcript
+    
+    if i < length//2:
+        joint_transcript = ta_transcript + " " + libri_transcript
+        OUTPUT_TRANSCRIPT.write(output_file_name + '\t' + joint_transcript + '\n')
+        ffmpeg.concat(ta_file,libri_file,v = 0,a = 1).output(os.path.join(OUTPUT_DIR,output_file_name + '.wav')).run()
 
-    OUTPUT_TRANSCRIPT.write(output_file_name + '\t' + joint_transcript + '\n')
+    else:
+        joint_transcript = libri_transcript + " " + ta_transcript
+        ffmpeg.concat(libri_file,ta_file,v = 0, a = 1).output(os.path.join(OUTPUT_DIR,output_file_name + '.wav')).run()
+        OUTPUT_TRANSCRIPT.write(output_file_name + '\t' + joint_transcript + '\n')
 
-    ffmpeg.concat(ta_file,libri_file,v = 0,a = 1).output(os.path.join(OUTPUT_DIR,output_file_name + '.wav')).run()

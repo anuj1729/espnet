@@ -1,7 +1,7 @@
 import os
 
-DATA_DIR = '/home/ram/anuj/espnet/egs/tamil/asr1/data/code_mixed_synthetic'
-CM_DATA_DIR = '/home/ram/anuj/espnet/egs/tamil/asr1/downloads/Synthetic'
+DATA_DIR = '/home/ram/anuj/espnet/egs/tamil/asr1/data/code_mixed_synthetic_2'
+CM_DATA_DIR = '/home/ram/anuj/espnet/egs/tamil/asr1/downloads/Synthetic2'
 
 transcript_file = open(os.path.join(CM_DATA_DIR,'transcript.txt'),'r')
 
@@ -18,6 +18,6 @@ for x in transcript_file:
     text.write(utterance_id + " " + transcript)
     utt2spk.write(utterance_id + " " + speaker_id +"\n")
     spk2utt.write(speaker_id + " " + utterance_id + "\n")
-    wav_scp.write(utterance_id + " sox " + os.path.join(CM_DATA_DIR,utterance_id  + '.wav') + " -t wav -r 16000 -b 16 - |\n")
+    wav_scp.write(utterance_id + " sox " + os.path.join(CM_DATA_DIR,utterance_id + '.wav')  + " -t wav -r 16000 -b 16 - |\n")
 
     # wav_scp.write(utterance_id + " sox " + os.path.join(source + "/Audios",utterance + '.wav') + " -t wav -r 16000 -b 16 - |\n")i

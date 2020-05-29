@@ -76,7 +76,7 @@ ta_train_set=ta_train
 ta_dev_set=ta_dev
 ta_test_set=ta_test
 
-code_mixed_set=code_mixed_synthetic
+code_mixed_set=code_mixed_synthetic_2
 
 train_set=train_nodev
 train_dev=train_dev
